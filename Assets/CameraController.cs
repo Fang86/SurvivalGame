@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-    public float sensitivity = 100f;
+    public float sensitivity = 15f;
 
     private float pitch = 0f; // rotation around X-axis (up/down)
     private float yaw = 0f;   // rotation around Y-axis (left/right)

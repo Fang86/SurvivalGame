@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour
     void Fire()
     {
         // Spawn slightly in front of the camera
-        Vector3 spawnPosition = camera.transform.position + camera.transform.forward * 1.5f;
+        Vector3 spawnPosition = camera.transform.position + camera.transform.forward * 1f;
         
         // Create the projectile
         GameObject projectile = Instantiate(projectilePrefab, spawnPosition, camera.transform.rotation);

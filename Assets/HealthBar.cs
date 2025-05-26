@@ -7,12 +7,12 @@ public class HealthBar : MonoBehaviour
     public float maxHealth = 100f;
     public float currentHealth = 100f;
     public Vector3 offset = new Vector3(0, 2f, 0); // Offset above entity
-    public Vector2 healthBarSize = new Vector2(2f, 0.3f);
+    public Vector2 healthBarSize = new Vector2(1.35f, 0.15f);
     
     [Header("Colors")]
     public Color healthColor = Color.green;
-    public Color lowHealthColor = Color.red;
-    public Color backgroundColor = Color.gray;
+    public Color lowHealthColor = Color.green;
+    public Color backgroundColor = Color.red;
     
     [Header("Behavior")]
     public bool alwaysVisible = true;
@@ -75,8 +75,7 @@ public class HealthBar : MonoBehaviour
         // Create Canvas
         GameObject canvasObj = new GameObject("HealthBarCanvas");
         canvasObj.transform.SetParent(transform);
-        canvasObj.transform.localPosition = transform.localPosition + offset;
-        
+        canvasObj.transform.localPosition = offset;
         
         healthCanvas = canvasObj.AddComponent<Canvas>();
         healthCanvas.renderMode = RenderMode.WorldSpace;
@@ -92,6 +91,7 @@ public class HealthBar : MonoBehaviour
         // Create health bar background
         GameObject backgroundObj = new GameObject("HealthBarBackground");
         backgroundObj.transform.SetParent(canvasObj.transform);
+        backgroundObj.transform.localPosition = Vector3.zero;
         
         healthBarBackground = backgroundObj.AddComponent<Image>();
         healthBarBackground.color = backgroundColor;
