@@ -11,16 +11,11 @@ public class PlayerController : MonoBehaviour
     [Header("Configurations")]
     public float walkSpeed;
     public float runSpeed;
-
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
-    }
+    public float jumpForce = 5f;
+    
+    [Header("Ground Detection")]
+    public LayerMask groundLayerMask = 1; // What counts as ground
+    public float groundCheckDistance = 0.1f;
 
     void FixedUpdate()
     {
