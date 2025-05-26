@@ -1,5 +1,3 @@
-using System;
-using Mono.Cecil;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -88,6 +86,21 @@ public class PlayerController : MonoBehaviour
     {
         CheckGrounded();
 
+        Transform playerTransform = GetComponent<Transform>();
+
+        // Crouching - only apply transform changes if we just started crouching
+        bool crouching = Keyboard.current.leftCtrlKey.isPressed;
+        if (crouching && playerTransform.localScale.y == 1f)
+        {
+            playerTransform.localScale = new Vector3(playerTransform.localScale.x, 0.5f, playerTransform.localScale.z);
+            transform.position -= Vector3.up * (1f - 0.5f);
+        }
+        else if (!crouching && playerTransform.localScale.y != 1f)
+        {
+            playerTransform.localScale = new Vector3(playerTransform.localScale.x, 1f, playerTransform.localScale.z);
+            transform.position += Vector3.up * (1f - 0.5f);
+        }
+
         float moveSpeed = Keyboard.current.leftShiftKey.isPressed ? runSpeed : walkSpeed;
 
         float depthMultiplier = 0f;
@@ -142,7 +155,7 @@ public class PlayerController : MonoBehaviour
             projectileRb.linearVelocity = camera.transform.forward * projectileSpeed;
             
             // Optional: Add player's velocity to projectile for more realistic physics
-            projectileRb.linearVelocity += rb.linearVelocity;
+            //projectileRb.linearVelocity += rb.linearVelocity;
         }
         
         // Optional: Ignore collision between projectile and player
@@ -237,7 +250,7 @@ public class PlayerController : MonoBehaviour
             }
         }
         
-        Debug.Log($"Ground check - Grounded: {isGrounded}");
+        //Debug.Log($"Ground check - Grounded: {isGrounded}");
     }
 
     void Jump()

@@ -21,7 +21,7 @@ public class CameraController : MonoBehaviour
         pitch -= mouseDelta.y * sensitivity * Time.deltaTime;
 
         // Clamp pitch to avoid flipping over
-        pitch = Mathf.Clamp(pitch, -90f, 90f);
+        pitch = Mathf.Clamp(pitch, -89.9f, 89.9f);
 
         // Apply rotation: pitch around X, yaw around Y
         transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
