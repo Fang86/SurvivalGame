@@ -22,6 +22,7 @@ public class HealthBar : MonoBehaviour
     // UI Components
     private Canvas healthCanvas;
     private Image healthBarFill;
+    RectTransform healthBarFillRect;
     private Image healthBarBackground;
     private GameObject healthBarUI;
     public Camera playerCamera;
@@ -105,17 +106,18 @@ public class HealthBar : MonoBehaviour
         // Create health bar fill
         GameObject fillObj = new GameObject("HealthBarFill");
         fillObj.transform.SetParent(backgroundObj.transform);
+        fillObj.transform.localPosition = Vector3.zero;
         
         healthBarFill = fillObj.AddComponent<Image>();
         healthBarFill.color = healthColor;
         healthBarFill.type = Image.Type.Filled;
         healthBarFill.fillMethod = Image.FillMethod.Horizontal;
         
-        RectTransform fillRect = fillObj.GetComponent<RectTransform>();
-        fillRect.anchorMin = Vector2.zero;
-        fillRect.anchorMax = Vector2.one;
-        fillRect.offsetMin = Vector2.zero;
-        fillRect.offsetMax = Vector2.zero;
+        healthBarFillRect = fillObj.GetComponent<RectTransform>();
+        healthBarFillRect.anchorMin = Vector2.zero;
+        healthBarFillRect.anchorMax = Vector2.one;
+        healthBarFillRect.offsetMin = Vector2.zero;
+        healthBarFillRect.offsetMax = Vector2.zero;
         
         healthBarUI = canvasObj;
     }
@@ -123,8 +125,14 @@ public class HealthBar : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth = Mathf.Max(0, currentHealth - damage);
+        Debug.Log($"Hit! Current health: {currentHealth}");
         UpdateHealthBar();
         ShowHealthBar(); // Show when taking damage
+        if (currentHealth == 0f)
+        {
+            Debug.Log("Destroy!");
+            Destroy(gameObject);
+        }
     }
 
     public void Heal(float healAmount)
@@ -150,13 +158,15 @@ public class HealthBar : MonoBehaviour
     void UpdateHealthBar()
     {
         if (healthBarFill == null) return;
-        
+
         float healthPercentage = currentHealth / maxHealth;
         healthBarFill.fillAmount = healthPercentage;
-        
+        healthBarFillRect.anchorMax = new Vector2(healthPercentage, 1f);
+        Debug.Log($"Health set to {healthPercentage}");
+
         // Change color based on health percentage
-        Color currentColor = Color.Lerp(lowHealthColor, healthColor, healthPercentage);
-        healthBarFill.color = currentColor;
+        //Color currentColor = Color.Lerp(lowHealthColor, healthColor, healthPercentage);
+        //healthBarFill.color = currentColor;
     }
 
     void ShowHealthBar()

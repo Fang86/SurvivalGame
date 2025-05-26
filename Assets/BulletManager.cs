@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class BulletManager : MonoBehaviour
 {
-    public float timeUntilDestruction = 80f;
+    public float timeUntilDestruction = 30f;
+    private float bulletDamage = 10f;
 
     // Update is called once per frame
     void Update()
@@ -12,13 +13,13 @@ public class BulletManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider collider)
     {
         // Check if it's NOT the player
-        if (!collision.gameObject.CompareTag("Player"))
+        if (!collider.gameObject.CompareTag("Player"))
         {
-            Debug.Log($"Hit object: {collision.gameObject.name}");
-            HandleCollision(collision.gameObject);  // Handle the collision for the entitythe bullet hit
+            Debug.Log($"Hit object: {collider.gameObject.name}");
+            HandleCollision(collider.gameObject);  // Handle the collision for the other collider object
             Destroy(gameObject);
         }
     }
@@ -28,9 +29,12 @@ public class BulletManager : MonoBehaviour
         // Your method here
         Debug.Log($"Collision detected with non-player object! {hitObject.name}");
 
-        // Example actions:
-        // Destroy(gameObject); // Destroy this object
-        // hitObject.GetComponent<Health>()?.TakeDamage(10);
-        
+        hitObject.GetComponent<HealthBar>()?.TakeDamage(bulletDamage);
+
+    }
+
+    public void SetDamage(float damage)
+    {
+        bulletDamage = damage;
     }
 }

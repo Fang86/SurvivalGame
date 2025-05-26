@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public GameObject projectilePrefab;
     public float projectileSpeed = 20f;
     public float attackRate = .5f;   // time between shots
+    public float attackDamage = 10f;
     private float timeSinceLastAttack = 0f;
     public AudioClip attackSound;
     private AudioSource audioSource;
@@ -134,6 +135,11 @@ public class PlayerController : MonoBehaviour
 
     void HandleAttacking()
     {
+        if (Mouse.current.rightButton.isPressed)
+            camera.fieldOfView = 35f;
+        else
+            camera.fieldOfView = 60f;
+
         if (Mouse.current.leftButton.isPressed && timeSinceLastAttack == 0)
         {
             Fire();
@@ -153,7 +159,10 @@ public class PlayerController : MonoBehaviour
         
         // Create the projectile
         GameObject projectile = Instantiate(projectilePrefab, spawnPosition, camera.transform.rotation);
-        audioSource.PlayOneShot(attackSound);
+
+        projectile.GetComponent<BulletManager>().SetDamage(attackDamage);
+
+        audioSource.PlayOneShot(attackSound, 0.1f);
         
         // Add velocity to the projectile
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
