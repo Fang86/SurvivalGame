@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     public float projectileSpeed = 20f;
     public float attackRate = .5f;   // time between shots
     private float timeSinceLastAttack = 0f;
+    public AudioClip attackSound;
+    private AudioSource audioSource;
 
     [Header("Ground Detection")]
     public LayerMask groundLayerMask = 1; // What counts as ground
@@ -34,7 +36,11 @@ public class PlayerController : MonoBehaviour
     private bool hasJumpedThisFrame;
     private float timeSinceUngrounded = 0f;
 
-    
+    void Start()
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = attackSound;
+    }
 
     void OnGUI()
     {
@@ -147,6 +153,7 @@ public class PlayerController : MonoBehaviour
         
         // Create the projectile
         GameObject projectile = Instantiate(projectilePrefab, spawnPosition, camera.transform.rotation);
+        audioSource.PlayOneShot(attackSound);
         
         // Add velocity to the projectile
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
