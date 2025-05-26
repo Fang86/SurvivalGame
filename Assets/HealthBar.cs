@@ -15,7 +15,7 @@ public class HealthBar : MonoBehaviour
     public Color backgroundColor = Color.gray;
     
     [Header("Behavior")]
-    public bool alwaysVisible = false;
+    public bool alwaysVisible = true;
     public float hideWhenFullDelay = 2f; // Hide after 2 seconds when full health
     public bool faceCamera = true;
     
@@ -24,7 +24,7 @@ public class HealthBar : MonoBehaviour
     private Image healthBarFill;
     private Image healthBarBackground;
     private GameObject healthBarUI;
-    private Camera playerCamera;
+    public Camera playerCamera;
     
     // Internal
     private float hideTimer = 0f;
@@ -33,7 +33,8 @@ public class HealthBar : MonoBehaviour
     void Start()
     {
         CreateHealthBar();
-        playerCamera = Camera.main;
+        if (playerCamera == null)
+            playerCamera = Camera.main;
         UpdateHealthBar();
     }
 
@@ -74,7 +75,8 @@ public class HealthBar : MonoBehaviour
         // Create Canvas
         GameObject canvasObj = new GameObject("HealthBarCanvas");
         canvasObj.transform.SetParent(transform);
-        canvasObj.transform.localPosition = offset;
+        canvasObj.transform.localPosition = transform.localPosition + offset;
+        
         
         healthCanvas = canvasObj.AddComponent<Canvas>();
         healthCanvas.renderMode = RenderMode.WorldSpace;
