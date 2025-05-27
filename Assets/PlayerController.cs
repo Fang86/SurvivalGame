@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -37,10 +38,14 @@ public class PlayerController : MonoBehaviour
     private bool hasJumpedThisFrame;
     private float timeSinceUngrounded = 0f;
 
+    private Inventory inventory;
+
     void Start()
     {
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.clip = attackSound;
+
+        inventory = GetComponent<Inventory>();
     }
 
     void OnGUI()
@@ -52,10 +57,32 @@ public class PlayerController : MonoBehaviour
         GUILayout.Label($"Y Velocity: {rb.linearVelocity.y:F2}");
         GUILayout.Label($"Speed: {new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude:F2}");
         GUILayout.Label($"timeSinceLastAttack: {timeSinceLastAttack:F2}");
+        string items = "";
+        inventory.GetItems().ForEach(i => items += $", {i.Name}");
+        GUILayout.Label($"Inventory: {inventory.IsOpen()} - {items}");
         GUILayout.EndArea();
     }
 
     void Update()
+    {
+        HandleJumping();
+    }
+
+    void FixedUpdate()
+    {
+        wasGroundedLastFrame = isGrounded;
+
+        if (!inventory.IsOpen())
+        {
+            HandleMovement();
+            HandleAttacking();
+        }
+        
+        //HandleGroundSnapping();
+        TrackAirTime();
+    }
+
+    void HandleJumping()
     {
         // Jump input
         if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
@@ -69,13 +96,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    void TrackAirTime()
     {
-        wasGroundedLastFrame = isGrounded;
-
-        HandleMovement();
-        //HandleGroundSnapping();
-
         // Track time since we lost ground contact
         if (!isGrounded && wasGroundedLastFrame)
         {
@@ -85,8 +107,6 @@ public class PlayerController : MonoBehaviour
         {
             timeSinceUngrounded += Time.fixedDeltaTime;
         }
-
-        HandleAttacking();
     }
 
     void HandleMovement()

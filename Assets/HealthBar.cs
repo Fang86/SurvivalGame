@@ -160,9 +160,12 @@ public class HealthBar : MonoBehaviour
         if (healthBarFill == null) return;
 
         float healthPercentage = currentHealth / maxHealth;
-        healthBarFill.fillAmount = healthPercentage;
-        healthBarFillRect.anchorMax = new Vector2(healthPercentage, 1f);
-        Debug.Log($"Health set to {healthPercentage}");
+        if (healthBarFill.fillAmount != healthPercentage)
+        {
+            healthBarFill.fillAmount = healthPercentage;
+            healthBarFillRect.anchorMax = new Vector2(healthPercentage, 1f);
+            Debug.Log($"Health set to {healthPercentage}");
+        }
 
         // Change color based on health percentage
         //Color currentColor = Color.Lerp(lowHealthColor, healthColor, healthPercentage);

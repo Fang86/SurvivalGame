@@ -15,15 +15,18 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
-        yaw += mouseDelta.x * sensitivity * Time.deltaTime;
-        pitch -= mouseDelta.y * sensitivity * Time.deltaTime;
+            yaw += mouseDelta.x * sensitivity * Time.deltaTime;
+            pitch -= mouseDelta.y * sensitivity * Time.deltaTime;
 
-        // Clamp pitch to avoid flipping over
-        pitch = Mathf.Clamp(pitch, -89.9f, 89.9f);
+            // Clamp pitch to avoid flipping over
+            pitch = Mathf.Clamp(pitch, -89.9f, 89.9f);
 
-        // Apply rotation: pitch around X, yaw around Y
-        transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+            // Apply rotation: pitch around X, yaw around Y
+            transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
     }
 }
