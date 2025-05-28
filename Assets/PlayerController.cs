@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,13 +16,9 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 300f;
 
     [Header("Attacking")]
-    public GameObject projectilePrefab;
-    public float projectileSpeed = 20f;
     public float attackRate = .5f;   // time between shots
-    public float attackDamage = 10f;
-    private float timeSinceLastAttack = 0f;
-    public AudioClip attackSound;
-    private AudioSource audioSource;
+    private float timeUntilAbleToAttack = 0f;
+    public Gun playerWeapon;
 
     [Header("Ground Detection")]
     public LayerMask groundLayerMask = 1; // What counts as ground
@@ -42,9 +39,6 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        audioSource = gameObject.AddComponent<AudioSource>();
-        audioSource.clip = attackSound;
-
         inventory = GetComponent<Inventory>();
     }
 
@@ -56,7 +50,7 @@ public class PlayerController : MonoBehaviour
         GUILayout.Label($"Is Grounded: {isGrounded}");
         GUILayout.Label($"Y Velocity: {rb.linearVelocity.y:F2}");
         GUILayout.Label($"Speed: {new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude:F2}");
-        GUILayout.Label($"timeSinceLastAttack: {timeSinceLastAttack:F2}");
+        GUILayout.Label($"timeSinceLastAttack: {timeUntilAbleToAttack:F2}");
         string items = "";
         inventory.GetItems().ForEach(i => items += $", {i.Name}");
         GUILayout.Label($"Inventory: {inventory.IsOpen()} - {items}");
@@ -80,6 +74,14 @@ public class PlayerController : MonoBehaviour
         
         //HandleGroundSnapping();
         TrackAirTime();
+    }
+
+    void HandleAttacking()
+    {
+        bool isAiming = Mouse.current.rightButton.isPressed;
+        bool isFiring = Mouse.current.leftButton.isPressed;
+        
+        playerWeapon.HandleInput(isAiming, isFiring);
     }
 
     void HandleJumping()
@@ -151,56 +153,6 @@ public class PlayerController : MonoBehaviour
         moveDirection = moveDirection.normalized;
 
         rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
-    }
-
-    void HandleAttacking()
-    {
-        if (Mouse.current.rightButton.isPressed)
-            camera.fieldOfView = 35f;
-        else
-            camera.fieldOfView = 60f;
-
-        if (Mouse.current.leftButton.isPressed && timeSinceLastAttack == 0)
-        {
-            Fire();
-            timeSinceLastAttack = attackRate;
-        }
-
-        if (timeSinceLastAttack != 0)
-        {
-            timeSinceLastAttack = Mathf.Max(0f, timeSinceLastAttack - Time.deltaTime);
-        }
-    }
-
-    void Fire()
-    {
-        // Spawn slightly in front of the camera
-        Vector3 spawnPosition = camera.transform.position + camera.transform.forward * 1f;
-        
-        // Create the projectile
-        GameObject projectile = Instantiate(projectilePrefab, spawnPosition, camera.transform.rotation);
-
-        projectile.GetComponent<BulletManager>().SetDamage(attackDamage);
-
-        audioSource.PlayOneShot(attackSound, 0.1f);
-        
-        // Add velocity to the projectile
-        Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-        if (projectileRb != null)
-        {
-            projectileRb.linearVelocity = camera.transform.forward * projectileSpeed;
-            
-            // Optional: Add player's velocity to projectile for more realistic physics
-            //projectileRb.linearVelocity += rb.linearVelocity;
-        }
-        
-        // Optional: Ignore collision between projectile and player
-        Collider projectileCollider = projectile.GetComponent<Collider>();
-        Collider playerCollider = GetComponent<Collider>();
-        if (projectileCollider != null && playerCollider != null)
-        {
-            Physics.IgnoreCollision(projectileCollider, playerCollider);
-        }
     }
 
     void HandleGroundSnapping()

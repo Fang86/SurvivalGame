@@ -9,6 +9,7 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private GameObject itemSlotPrefab;
     [SerializeField] private Transform gridParent;
     [SerializeField] private Inventory playerInventory;
+    public Tooltip tooltip;
     
     private List<GameObject> itemSlots = new List<GameObject>();
 
@@ -48,6 +49,7 @@ public class InventoryUI : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         playerInventory.SetOpen(false);
         inventoryPanel.SetActive(false);
+        tooltip.gameObject.SetActive(false);
     }
     
     void CreateSlots()
