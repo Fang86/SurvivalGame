@@ -6,6 +6,7 @@ public class TerrainGenerator : MonoBehaviour
     public int terrainWidth = 512;
     public int terrainHeight = 512;
     public int maxTerrainHeight = 30; // Max height in world units
+    public int terrainResolution = 513;
     
     [Header("Generation Settings")]
     public int seed = 12345;
@@ -84,7 +85,7 @@ public class TerrainGenerator : MonoBehaviour
         TerrainData terrainData = terrain.terrainData;
         
         // Set terrain size
-        terrainData.heightmapResolution = terrainWidth + 1;
+        terrainData.heightmapResolution = terrainResolution;
         terrainData.size = new Vector3(terrainWidth, maxTerrainHeight, terrainHeight);
         
         // Generate and apply heights

@@ -106,6 +106,12 @@ public class EnemyController : MonoBehaviour
         Debug.DrawRay(rayStart, Vector3.down * groundCheckDistance, Color.yellow);
     }
 
+    void OnDestroy()
+    {
+        Debug.Log($"Enemy {name} was destroyed!");
+        Debug.Log($"Stack trace: {System.Environment.StackTrace}");
+    }
+
     // Visual debugging
     void OnDrawGizmosSelected()
     {

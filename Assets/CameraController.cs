@@ -3,9 +3,11 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
+    private GameObject player;
+    private GameObject gun;
+
     public float sensitivity = 7f;
     public float aimingSensitivity = 5f;
-
     private float effectiveSensitivity;
 
     private float pitch = 0f; // rotation around X-axis (up/down)
@@ -13,6 +15,9 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
+        player = transform.parent.parent.gameObject;
+        gun = player.GetComponentInChildren<Gun>().gameObject;
+
         effectiveSensitivity = sensitivity;
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -29,8 +34,10 @@ public class CameraController : MonoBehaviour
             // Clamp pitch to avoid flipping over
             pitch = Mathf.Clamp(pitch, -89.9f, 89.9f);
 
-            // Apply rotation: pitch around X, yaw around Y
+            // Apply rotation to the player: pitch around X, yaw around Y
+            player.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
             transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+            gun.transform.rotation = Quaternion.Euler(0f, yaw+270, -pitch);  // pitch around z because the gun is rotated 270 degrees around the Y
         }
     }
 

@@ -13,7 +13,10 @@ public class Gun : MonoBehaviour
     [Header("Scope Settings")]
     public float baseFOV = 65f;
     public float scopeMagnification = 2f;
-    
+
+    [Header("Other")]
+    public Transform barrelEnd;
+
     private AudioSource audioSource;
     private Camera playerCamera;
     private CameraController playerCameraController;
@@ -62,6 +65,7 @@ public class Gun : MonoBehaviour
     {
         Vector3 rayOrigin = playerCamera.transform.position;
         Vector3 rayDirection = playerCamera.transform.forward;
+        Vector3 bulletOrigin = barrelEnd.position;
 
         // Immediate raycast to get distance and target
         if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, range))
@@ -76,11 +80,11 @@ public class Gun : MonoBehaviour
                 StartCoroutine(DelayedDamage(hit.collider, travelTime));
             }
 
-            CreateVisualBullet(rayOrigin, hit.point);
+            CreateVisualBullet(bulletOrigin, hit.point);
         }
         else
         {
-            CreateVisualBullet(rayOrigin, rayOrigin + rayDirection * range);
+            CreateVisualBullet(bulletOrigin, bulletOrigin + rayDirection * range);
         }
 
         // Play sound
