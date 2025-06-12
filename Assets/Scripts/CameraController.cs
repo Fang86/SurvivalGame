@@ -74,35 +74,4 @@ public class CameraController : MonoBehaviour
         Vector3 targetPosition = transform.position + transform.TransformDirection(gunOffset);
         gun.transform.position = Vector3.Lerp(gun.transform.position, targetPosition, smoothSpeed * Time.deltaTime);
     }
-
-    void UpdateWeaponPosition_Old(float cameraPitch)
-    {
-        // Calculate sphere center relative to player
-        sphereCenter = player.transform.position + player.transform.TransformDirection(sphereOffset);
-        
-        // Get camera pitch (X rotation, clamped to reasonable range)
-        //float cameraPitch = Mathf.Clamp(transform.eulerAngles.x, -60f, 60f);
-        if (cameraPitch > 180f) cameraPitch -= 360f; // Handle wrap-around
-        
-        // Calculate spherical coordinates
-        float azimuth = baseAzimuthAngle * Mathf.Deg2Rad;
-        float polar = (basePolarAngle + cameraPitch) * Mathf.Deg2Rad;
-        
-        // Convert to Cartesian coordinates on sphere
-        Vector3 localPosition = new Vector3(
-            sphereRadius * Mathf.Sin(polar) * Mathf.Cos(azimuth),
-            sphereRadius * Mathf.Cos(polar),
-            sphereRadius * Mathf.Sin(polar) * Mathf.Sin(azimuth)
-        );
-        
-        // Transform to world space (rotate with player body)
-        Vector3 worldPosition = sphereCenter + player.transform.TransformDirection(localPosition);
-        
-        // Position the weapon
-        gun.transform.position = worldPosition;
-        
-        // Calculate weapon rotation to point toward sphere center
-        Vector3 directionToCenter = (sphereCenter - gun.transform.position).normalized;
-        gun.transform.rotation = Quaternion.LookRotation(directionToCenter, player.transform.up);
-    }
 }

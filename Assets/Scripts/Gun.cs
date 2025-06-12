@@ -66,67 +66,21 @@ public class Gun : MonoBehaviour
         Vector3 rayOrigin = playerCamera.transform.position;
         Vector3 rayDirection = playerCamera.transform.forward;
         Vector3 bulletOrigin = barrelEnd.position;
+        Vector3 bulletDirection = rayDirection;
 
-        // Immediate raycast to get distance and target
         if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, range))
         {
-            // Calculate travel time based on distance
-            float distance = hit.distance;
-            float travelTime = distance / visualSpeed;
-
-            // Delay damage based on travel time
-            if (hit.collider.CompareTag("Enemy"))
-            {
-                StartCoroutine(DelayedDamage(hit.collider, travelTime));
-            }
-
-            CreateVisualBullet(bulletOrigin, hit.point);
+            bulletDirection = (hit.point - bulletOrigin).normalized;
         }
-        else
-        {
-            CreateVisualBullet(bulletOrigin, bulletOrigin + rayDirection * range);
-        }
+
+        GameObject bullet = Instantiate(bulletPrefab, bulletOrigin - (bulletDirection * visualSpeed/50), transform.rotation);
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+        bulletRb.linearVelocity = bulletDirection * visualSpeed;
 
         // Play sound
         if (audioSource && fireSound)
         {
             audioSource.PlayOneShot(fireSound, 0.1f);
         }
-    }
-    
-    System.Collections.IEnumerator DelayedDamage(Collider target, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        
-        // Apply damage after travel time
-        if (target != null && target.CompareTag("Enemy"))
-        {
-            HealthBar enemyHealth = target.GetComponent<HealthBar>();
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage(damage);
-            }
-        }
-    }
-    
-    void CreateVisualBullet(Vector3 start, Vector3 end)
-    {
-        GameObject bullet = Instantiate(bulletPrefab, start, Quaternion.LookRotation(end - start));
-        StartCoroutine(AnimateBullet(bullet, start, end));
-    }
-    
-    System.Collections.IEnumerator AnimateBullet(GameObject bullet, Vector3 start, Vector3 end)
-    {
-        float journey = 0f;
-        float distance = Vector3.Distance(start, end);
-        
-        while (journey <= 1f && bullet != null)
-        {
-            journey += (visualSpeed / distance) * Time.deltaTime;
-            bullet.transform.position = Vector3.Lerp(start, end, journey);
-            yield return null;
-        }
-        
-        if (bullet != null) Destroy(bullet);
     }
 }

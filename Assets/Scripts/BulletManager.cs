@@ -1,9 +1,22 @@
+using System;
+using System.Linq.Expressions;
 using UnityEngine;
 
 public class BulletManager : MonoBehaviour
 {
     public float timeUntilDestruction = 30f;
     private float bulletDamage = 10f;
+    private Rigidbody rb;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
+    void FixedUpdate()
+    {
+        CheckCollisions();
+    }
 
     // Update is called once per frame
     void Update()
@@ -13,14 +26,19 @@ public class BulletManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    void OnTriggerEnter(Collider collider)
+    void CheckCollisions()
     {
-        // Check if it's NOT the player
-        if (!collider.gameObject.CompareTag("Player"))
+        Vector3 nextPosition = transform.position + (rb.linearVelocity * Time.deltaTime);
+        float travelDistance = Vector3.Distance(transform.position, nextPosition);
+
+        bool raycastHit = Physics.Raycast(transform.position, rb.linearVelocity.normalized, out RaycastHit hit, travelDistance);
+        //Debug.Log(travelDistance, hit.collider);
+        Debug.Log(rb.linearVelocity + " | " + transform.position + " | " +  nextPosition + " | " + travelDistance);
+        if (raycastHit && !hit.collider.gameObject.CompareTag("Player"))
         {
-            Debug.Log($"Hit object: {collider.gameObject.name}");
-            HandleCollision(collider.gameObject);  // Handle the collision for the other collider object
-            Destroy(gameObject);
+            // Handle collision before physics step occurs
+            // TODO: Consider animating bullet to hit point before handling the collision
+            HandleCollision(hit.collider.gameObject);
         }
     }
 
@@ -31,6 +49,13 @@ public class BulletManager : MonoBehaviour
 
         hitObject.GetComponent<HealthBar>()?.TakeDamage(bulletDamage);
 
+        if (!hitObject.CompareTag("Enemy"))
+        {
+            Vector3 force = rb.linearVelocity * rb.mass;
+            hitObject.GetComponent<Rigidbody>()?.AddForce(force);
+        }
+
+        Destroy(gameObject);
     }
 
     public void SetDamage(float damage)
