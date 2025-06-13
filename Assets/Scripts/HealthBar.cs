@@ -122,7 +122,8 @@ public class HealthBar : MonoBehaviour
         healthBarUI = canvasObj;
     }
 
-    public void TakeDamage(float damage)
+    // Returns true if the damage killed the entity
+    public bool TakeDamage(float damage)
     {
         currentHealth = Mathf.Max(0, currentHealth - damage);
         Debug.Log($"Hit! Current health: {currentHealth}");
@@ -132,7 +133,9 @@ public class HealthBar : MonoBehaviour
         {
             Debug.Log("Destroy!");
             Destroy(gameObject);
+            return true;
         }
+        return false;
     }
 
     public void Heal(float healAmount)

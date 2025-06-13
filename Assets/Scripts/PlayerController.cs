@@ -51,6 +51,7 @@ public class PlayerController : MonoBehaviour
         GUILayout.Label($"Y Velocity: {rb.linearVelocity.y:F2}");
         GUILayout.Label($"Speed: {new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude:F2}");
         GUILayout.Label($"timeSinceLastAttack: {timeUntilAbleToAttack:F2}");
+        GUILayout.Label($"Ammo: {playerWeapon.GetAmmoInMagazine():F2}");
         string items = "";
         inventory.GetItems().ForEach(i => items += $", {i.Name}");
         GUILayout.Label($"Inventory: {inventory.IsOpen()} - {items}");
@@ -60,6 +61,11 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         HandleJumping();
+
+        if (!inventory.IsOpen())
+        {
+            HandleWeaponInput();
+        }
     }
 
     void FixedUpdate()
@@ -69,19 +75,25 @@ public class PlayerController : MonoBehaviour
         if (!inventory.IsOpen())
         {
             HandleMovement();
-            HandleAttacking();
+            
         }
         
         //HandleGroundSnapping();
         TrackAirTime();
     }
 
-    void HandleAttacking()
+    void HandleWeaponInput()
     {
-        bool isAiming = Mouse.current.rightButton.isPressed;
-        bool isFiring = Mouse.current.leftButton.isPressed;
+        bool pressingAim = Mouse.current.rightButton.isPressed;
+        bool pressingFire = Mouse.current.leftButton.isPressed;
+        bool pressedReload = Keyboard.current.rKey.wasPressedThisFrame;
+
+        if (pressedReload)
+        {
+            Debug.Log("Reload!");
+        }
         
-        playerWeapon.HandleInput(isAiming, isFiring);
+        playerWeapon.HandleInput(pressingAim, pressingFire, pressedReload);
     }
 
     void HandleJumping()

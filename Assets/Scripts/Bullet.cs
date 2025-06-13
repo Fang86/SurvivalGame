@@ -1,12 +1,15 @@
 using System;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class BulletManager : MonoBehaviour
+public class Bullet : MonoBehaviour
 {
-    public float timeUntilDestruction = 30f;
-    private float bulletDamage = 10f;
+    public float timeUntilDestruction = 8f;
     private Rigidbody rb;
+    private float bulletDamage;
+
+    private Action killCallback;
 
     void Start()
     {
@@ -33,7 +36,7 @@ public class BulletManager : MonoBehaviour
 
         bool raycastHit = Physics.Raycast(transform.position, rb.linearVelocity.normalized, out RaycastHit hit, travelDistance);
         //Debug.Log(travelDistance, hit.collider);
-        Debug.Log(rb.linearVelocity + " | " + transform.position + " | " +  nextPosition + " | " + travelDistance);
+        //Debug.Log(rb.linearVelocity + " | " + transform.position + " | " +  nextPosition + " | " + travelDistance);
         if (raycastHit && !hit.collider.gameObject.CompareTag("Player"))
         {
             // Handle collision before physics step occurs
@@ -47,13 +50,17 @@ public class BulletManager : MonoBehaviour
         // Your method here
         Debug.Log($"Collision detected with non-player object! {hitObject.name}");
 
-        hitObject.GetComponent<HealthBar>()?.TakeDamage(bulletDamage);
-
-        if (!hitObject.CompareTag("Enemy"))
+        if (hitObject.GetComponent<HealthBar>()?.TakeDamage(bulletDamage) == true)
         {
-            Vector3 force = rb.linearVelocity * rb.mass;
-            hitObject.GetComponent<Rigidbody>()?.AddForce(force);
+            Debug.Log("Killed");
+            killCallback?.Invoke();
         }
+
+        if (!hitObject.CompareTag("Enemy") && hitObject.GetComponent<Rigidbody>() != null)
+            {
+                Vector3 force = rb.linearVelocity * rb.mass;
+                hitObject.GetComponent<Rigidbody>().AddForce(force);
+            }
 
         Destroy(gameObject);
     }
@@ -61,5 +68,10 @@ public class BulletManager : MonoBehaviour
     public void SetDamage(float damage)
     {
         bulletDamage = damage;
+    }
+
+    public void SetKillCallback(Action callback)
+    {
+        killCallback = callback;
     }
 }

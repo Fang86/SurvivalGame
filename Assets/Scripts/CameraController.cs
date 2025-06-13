@@ -13,16 +13,13 @@ public class CameraController : MonoBehaviour
     private float pitch = 0f; // rotation around X-axis (up/down)
     private float yaw = 0f;   // rotation around Y-axis (left/right)
 
-    [Header("Weapon Settings")]
-    public float sphereRadius = 1.5f;
-    public Vector3 sphereOffset = new Vector3(0, -0.2f, 0); // Slightly below head
-    public float baseAzimuthAngle = 45f; // Base angle around Y-axis (in degrees)
-    public float basePolarAngle = 15f;   // Base angle from horizontal (in degrees)
-    private Vector3 sphereCenter;
-
     [Header("Gun Position Settings")]
     public Vector3 gunOffset = new Vector3(0.5f, -0.3f, 0.8f); // Right, Down, Forward
     public float smoothSpeed = 10f;
+
+    private bool isKicking = false;
+    private Vector3 kickRotationOffset;
+    public float returnSpeed = 5f;
 
     void Start()
     {
@@ -48,9 +45,27 @@ public class CameraController : MonoBehaviour
             // Apply rotation to the player: pitch around X, yaw around Y
             player.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
             transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+            transform.localEulerAngles += kickRotationOffset;
             //UpdateWeaponPosition(pitch);
             UpdateWeaponPosition();
             gun.transform.rotation = Quaternion.Euler(0f, yaw + 270, -pitch);  // pitch around z because the gun is rotated 270 degrees around the Y
+        }
+
+        if (isKicking)
+        {
+            // Smoothly return to original rotation
+            kickRotationOffset = Vector3.Lerp(
+                kickRotationOffset, 
+                Vector3.zero, 
+                returnSpeed * Time.deltaTime
+            );
+            
+            // Stop kicking when close enough to original
+            if (Vector3.Distance(kickRotationOffset, Vector3.zero) < 0.1f)
+            {
+                kickRotationOffset = Vector3.zero;
+                isKicking = false;
+            }
         }
     }
 
@@ -73,5 +88,11 @@ public class CameraController : MonoBehaviour
     {
         Vector3 targetPosition = transform.position + transform.TransformDirection(gunOffset);
         gun.transform.position = Vector3.Lerp(gun.transform.position, targetPosition, smoothSpeed * Time.deltaTime);
+    }
+
+    public void KickCamera(float verticalKick, float horizontalKick)
+    {
+        isKicking = true;
+        kickRotationOffset += new Vector3(-verticalKick, horizontalKick, 0);
     }
 }

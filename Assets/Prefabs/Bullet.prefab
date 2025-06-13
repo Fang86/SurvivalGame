@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: c2e40fa84d53ccd428f640eac126b1fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -147,10 +147,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5389542646949475079}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bf829643b014e84e829bfbb8da8980e, type: 3}
+  m_Script: {fileID: 11500000, guid: 0127119c471e3104ab747443ba3ec3ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeUntilDestruction: 10
+  timeUntilDestruction: 8
 --- !u!96 &9133167547349455701
 TrailRenderer:
   serializedVersion: 3
